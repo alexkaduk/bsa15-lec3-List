@@ -1,0 +1,6 @@
+H:\projects\bsa15-lec3-List\bsa15-lec2-List\bin\Debug\bsa15-lec2-List.exe.config
+H:\projects\bsa15-lec3-List\bsa15-lec2-List\obj\Debug\bsa15-lec2-List.exe
+H:\projects\bsa15-lec3-List\bsa15-lec2-List\obj\Debug\bsa15-lec2-List.pdb
+H:\projects\bsa15-lec3-List\bsa15-lec2-List\bin\Debug\bsa15-lec2-List.exe
+H:\projects\bsa15-lec3-List\bsa15-lec2-List\bin\Debug\bsa15-lec2-List.pdb
+H:\projects\bsa15-lec3-List\bsa15-lec2-List\obj\Debug\bsa15-lec3-List.csprojResolveAssemblyReference.cache
