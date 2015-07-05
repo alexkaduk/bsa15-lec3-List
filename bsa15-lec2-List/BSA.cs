@@ -19,7 +19,186 @@ namespace bsa15_lec3_List
         List<Question> questions;
         List<Category> categories;
 
-        
+        // -	Список людей, которые прошли тесты.
+        public void UsersPassTest()
+        {
+            var users = from work in testWorks
+                        join test in tests on work.TestName equals test.TestName
+                        where work.ResultMark >= test.PassMark
+                        select new
+                        {
+                            work.UserName,
+                            work.ResultMark,
+                            test.TestName,
+                            test.PassMark
+                        };
+            //    var result2 = from item in list
+            //                  where item.Group == "BSA Net"
+            //                  select item;
+            //var result = users.Where(item => new { Name = item.Name });
+            //var result = users.Where(item => item.CategoryId == 1).Select(student => new { Name = student.Name });
+            //var result3 = list.Where(item => item.Group == "BSA Net").Select(student => new { Name = student.Name, Mark = student.Mark });
+            //var result1 = user. .Where(item => item.Group == "BSA Net");
+
+            foreach (var item in users)
+            {
+                Console.WriteLine("{0} pass test '{1}' (result mark {2}, pass mark {3})", item.UserName, item.TestName, item.ResultMark, item.PassMark);
+            }
+        }
+
+        //-	Список тех, кто прошли тесты успешно и уложилися во время.
+        public void UsersPassTestWithGoodTime()
+        {
+            var users = from work in testWorks
+                        join test in tests on work.TestName equals test.TestName
+                        where (work.ResultMark >= test.PassMark) && (work.ExecutionTime <= test.MaxTestTime)
+                        select new
+                        {
+                            work.UserName,
+                            work.ResultMark,
+                            work.ExecutionTime,
+                            test.TestName,
+                            test.PassMark,
+                            test.MaxTestTime
+                        };
+
+            foreach (var item in users)
+            {
+                Console.WriteLine("{0} pass test '{1}' with time {4} (result mark {2}, pass mark {3}, pass time {5})", item.UserName, item.TestName, item.ResultMark, item.PassMark, item.ExecutionTime, item.MaxTestTime);
+            }
+        }
+
+        //-	Список людей, которые прошли тесты успешно и не уложились во время
+        public void UsersPassTestWithBadTime()
+        {
+            var users = from work in testWorks
+                        join test in tests on work.TestName equals test.TestName
+                        where (work.ResultMark >= test.PassMark) && (work.ExecutionTime > test.MaxTestTime)
+                        select new
+                        {
+                            work.UserName,
+                            work.ResultMark,
+                            work.ExecutionTime,
+                            test.TestName,
+                            test.PassMark,
+                            test.MaxTestTime
+                        };
+
+            foreach (var item in users)
+            {
+                Console.WriteLine("{0} pass test '{1}' with bad time {4} (result mark {2}, pass mark {3}, pass time {5})", item.UserName, item.TestName, item.ResultMark, item.PassMark, item.ExecutionTime, item.MaxTestTime);
+            }
+        }
+
+        //-	Список студентов по городам. (Из Львова: 10 студентов, из Киева: 20)
+        public void UsersGroupByCity()
+        {
+            var usersFromCity = from user in users
+                                group user by user.City into g
+                                select new
+                                {
+                                    City = g.Key,
+                                    Count = g.Count()
+                                };
+
+            foreach (var item in usersFromCity)
+            {
+                Console.WriteLine("from {0}: {1} student(s)", item.City, item.Count);
+            }
+        }
+
+        //-	Список успешных студентов по городам.
+        public void UsersPassTestGroupByCity()
+        {
+            var usersFromCity = from user in users
+                                join work in testWorks on user.Name equals work.UserName
+                                join test in tests on work.TestName equals test.TestName
+                                where (work.ResultMark >= test.PassMark) && (work.ExecutionTime <= test.MaxTestTime)
+                                group user by user.City into g
+                                select new
+                                {
+                                    City = g.Key,
+                                    Count = g.Count()
+                                };
+
+            foreach (var item in usersFromCity)
+            {
+                Console.WriteLine("from {0}: {1} student(s)", item.City, item.Count);
+            }
+        }
+
+        //-	Результат для каждого студента - его баллы, время, баллы в процентах для каждой категории.
+        public void UsersResults()
+        {
+            var usersFromCity = from user in users
+                                join work in testWorks on user.Name equals work.UserName
+                                join test in tests on work.TestName equals test.TestName
+                                select new
+                                {
+                                    user.Name,
+                                    work.ResultMark,
+                                    work.ExecutionTime,
+                                    test.PassMark,
+                                    ResultPercent = work.ResultMark / test.PassMark * 100,
+                                };
+
+            foreach (var item in usersFromCity)
+            {
+                Console.WriteLine("{0}: mark {1}, time {2}, persent {3}% (max {4})", item.Name, item.ResultMark, item.ExecutionTime, item.ResultPercent, item.PassMark);
+            }
+        }   
+
+
+        //DataInit();
+
+        //var result1 = user. .Where(item => item.Group == "BSA Net");
+        //    var list = new List<Student>
+        //    {
+        //        new Student
+        //        {
+        //            Name = "Bill",
+        //            Group = "BSA Net",
+        //            Mark = 5
+        //        },
+        //        new Student
+        //        {
+        //            Name = "Mick",
+        //            Group = "BSA Net",
+        //            Mark = 4
+        //        },
+        //        new Student
+        //        {
+        //            Name = "Dima",
+        //            Group = "BSA JS",
+        //            Mark = 5
+        //        }
+        //    };
+
+        //    var result1 = list.Where(item => item.Group == "BSA Net");
+
+        //    //var result1 = list.Where(item => item.Group == "BSA Net").ToList();
+
+        //    var result2 = from item in list
+        //                  where item.Group == "BSA Net"
+        //                  select item;
+
+        //    var result3 = list.Where(item => item.Group == "BSA Net").Select(student => new { Name = student.Name, Mark = student.Mark });
+
+        //    foreach (var item in result3)
+        //    {
+        //        Console.WriteLine(item);
+        //    }
+
+        //    var someString = "one two three";
+        //    var splitted = someString.Split(' ');
+        //    var result4 = splitted.Aggregate((revert, item) => item + " " + revert).ToUpper();
+
+        //    Console.WriteLine(result4);
+
+        //    int[] intArray = { 1, 2, 3 };
+        //    var max = intArray.Aggregate((sqrSum, item) => sqrSum + item * item);
+        //    var max1 = intArray.Max();
+        //    Console.WriteLine(max);
 
         private void DataInit()
         {
@@ -41,6 +220,15 @@ namespace bsa15_lec3_List
                     Age = 25,
                     City = "Kyiv",
                     University = "KPI",
+                    CategoryId = 1
+                },
+                new User
+                {
+                    Name = "John",
+                    Email = "john@mail.ua",
+                    Age = 27,
+                    City = "Kyiv",
+                    University = "NaUKMA",
                     CategoryId = 1
                 },
                 new User
@@ -104,6 +292,13 @@ namespace bsa15_lec3_List
                     UserName = "Peter",
                     ResultMark = 4,
                     ExecutionTime = new TimeSpan(0, 22, 0)
+                },
+                new TestWork
+                {
+                    TestName = "Test #1",
+                    UserName = "John",
+                    ResultMark = 5,
+                    ExecutionTime = new TimeSpan(0, 21, 0)
                 }
             };
         }
@@ -143,7 +338,7 @@ namespace bsa15_lec3_List
                     Questions = new int[] { 7, 8 },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
-                },
+                }
             };
         }
 
