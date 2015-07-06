@@ -29,6 +29,8 @@ namespace bsa15_lec3_List
 
             bsa.UsersResults();
             Console.WriteLine();
+
+            Console.ReadKey();
         }
 
     }

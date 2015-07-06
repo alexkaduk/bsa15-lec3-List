@@ -10,7 +10,7 @@ namespace bsa15_lec3_List
     {
         public string TestName { get; set; }
         public int CategoryId { get; set; }
-        public int[] Questions { get; set; }
+        public List<Question> Questions { get; set; }
         public TimeSpan MaxTestTime { get; set; }
         public double PassMark { get; set; }
     }

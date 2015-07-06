@@ -32,17 +32,10 @@ namespace bsa15_lec3_List
                             test.TestName,
                             test.PassMark
                         };
-            //    var result2 = from item in list
-            //                  where item.Group == "BSA Net"
-            //                  select item;
-            //var result = users.Where(item => new { Name = item.Name });
-            //var result = users.Where(item => item.CategoryId == 1).Select(student => new { Name = student.Name });
-            //var result3 = list.Where(item => item.Group == "BSA Net").Select(student => new { Name = student.Name, Mark = student.Mark });
-            //var result1 = user. .Where(item => item.Group == "BSA Net");
-
+            Console.WriteLine("Task #1");
             foreach (var item in users)
             {
-                Console.WriteLine("{0} pass test '{1}' (result mark {2}, pass mark {3})", item.UserName, item.TestName, item.ResultMark, item.PassMark);
+                Console.WriteLine("{0} pass '{1}' (mark {2}, pass mark {3})", item.UserName, item.TestName, item.ResultMark, item.PassMark);
             }
         }
 
@@ -62,9 +55,10 @@ namespace bsa15_lec3_List
                             test.MaxTestTime
                         };
 
+            Console.WriteLine("Task #2");
             foreach (var item in users)
             {
-                Console.WriteLine("{0} pass test '{1}' with time {4} (result mark {2}, pass mark {3}, pass time {5})", item.UserName, item.TestName, item.ResultMark, item.PassMark, item.ExecutionTime, item.MaxTestTime);
+                Console.WriteLine("{0} pass '{1}' with time {4} min (mark {2}, pass mark {3}, pass time {5} min)", item.UserName, item.TestName, item.ResultMark, item.PassMark, item.ExecutionTime.Minutes, item.MaxTestTime.Minutes);
             }
         }
 
@@ -84,9 +78,10 @@ namespace bsa15_lec3_List
                             test.MaxTestTime
                         };
 
+            Console.WriteLine("Task #3");
             foreach (var item in users)
             {
-                Console.WriteLine("{0} pass test '{1}' with bad time {4} (result mark {2}, pass mark {3}, pass time {5})", item.UserName, item.TestName, item.ResultMark, item.PassMark, item.ExecutionTime, item.MaxTestTime);
+                Console.WriteLine("{0} pass '{1}' with bad time {4} min (mark {2}, pass mark {3}, pass time {5} min)", item.UserName, item.TestName, item.ResultMark, item.PassMark, item.ExecutionTime.Minutes, item.MaxTestTime.Minutes);
             }
         }
 
@@ -101,6 +96,7 @@ namespace bsa15_lec3_List
                                     Count = g.Count()
                                 };
 
+            Console.WriteLine("Task #4");
             foreach (var item in usersFromCity)
             {
                 Console.WriteLine("from {0}: {1} student(s)", item.City, item.Count);
@@ -121,6 +117,7 @@ namespace bsa15_lec3_List
                                     Count = g.Count()
                                 };
 
+            Console.WriteLine("Task #5");
             foreach (var item in usersFromCity)
             {
                 Console.WriteLine("from {0}: {1} student(s)", item.City, item.Count);
@@ -128,77 +125,50 @@ namespace bsa15_lec3_List
         }
 
         //-	Результат для каждого студента - его баллы, время, баллы в процентах для каждой категории.
+        // Кожний тест має у собі кілька питань різноманітних категорій, наприклад, ооп, .нет, бд. 
+        // Кожне питання має кількість балів за вірну відповідь, якщо цього не виставляти, то можна рахувати, що вірна відповідь 1 бал. 
+        // Таким чином у тесті, наприклад, 5 питань з категорії .нет. Максимально можна набрати 5 балів. Якщо вірно відповів користувач на 3 питання, то це 3 / 5  * 100 = 60%.
         public void UsersResults()
         {
-            var usersFromCity = from user in users
-                                join work in testWorks on user.Name equals work.UserName
-                                join test in tests on work.TestName equals test.TestName
-                                select new
-                                {
-                                    user.Name,
-                                    work.ResultMark,
-                                    work.ExecutionTime,
-                                    test.PassMark,
-                                    ResultPercent = work.ResultMark / test.PassMark * 100,
-                                };
+            // виконання до уточнення завдання
+            // var usersResults = from user in users
+            //                    join work in testWorks on user.Name equals work.UserName
+            //                    join test in tests on work.TestName equals test.TestName
+            //                    select new
+            //                    {
+            //                        user.Name,
+            //                        work.ResultMark,
+            //                        work.ExecutionTime,
+            //                        test.PassMark,
+            //                        ResultPercent = work.ResultMark / test.PassMark * 100,
+            //                    };
 
-            foreach (var item in usersFromCity)
+            var usersResults = users
+                                .Join(testWorks,
+                                        user => user.Name,
+                                        work => work.UserName,
+                                        (user, work) => new { user, work })
+                                .Join(tests,
+                                        tw => tw.work.TestName,
+                                        test => test.TestName,
+                                        (tw, test) => new { tw, test })
+                                .Select(r => new
+                                        {
+                                            Name = r.tw.user.Name,
+                                            ResultMark = r.tw.work.ResultMark,
+                                            ExecutionTime = r.tw.work.ExecutionTime,
+                                            TestQuestionMarkSum = r.test.Questions.Sum(q => q.Mark),
+                                            ResultPercent = r.tw.work.ResultMark / r.test.Questions.Sum(q => q.Mark) * 100
+                                        }
+                                );
+            
+            Console.WriteLine("Task #6");
+            Console.WriteLine("*** persent = (student_mark) / (max_mark) * 100 | max_mark = sum(test_question_mark)");
+            foreach (var item in usersResults)
             {
-                Console.WriteLine("{0}: mark {1}, time {2}, persent {3}% (max {4})", item.Name, item.ResultMark, item.ExecutionTime, item.ResultPercent, item.PassMark);
+                Console.WriteLine("{0}: mark {1}, time {2}, persent {3}% (max {4})", item.Name, item.ResultMark, item.ExecutionTime, item.ResultPercent, item.TestQuestionMarkSum);
             }
-        }   
-
-
-        //DataInit();
-
-        //var result1 = user. .Where(item => item.Group == "BSA Net");
-        //    var list = new List<Student>
-        //    {
-        //        new Student
-        //        {
-        //            Name = "Bill",
-        //            Group = "BSA Net",
-        //            Mark = 5
-        //        },
-        //        new Student
-        //        {
-        //            Name = "Mick",
-        //            Group = "BSA Net",
-        //            Mark = 4
-        //        },
-        //        new Student
-        //        {
-        //            Name = "Dima",
-        //            Group = "BSA JS",
-        //            Mark = 5
-        //        }
-        //    };
-
-        //    var result1 = list.Where(item => item.Group == "BSA Net");
-
-        //    //var result1 = list.Where(item => item.Group == "BSA Net").ToList();
-
-        //    var result2 = from item in list
-        //                  where item.Group == "BSA Net"
-        //                  select item;
-
-        //    var result3 = list.Where(item => item.Group == "BSA Net").Select(student => new { Name = student.Name, Mark = student.Mark });
-
-        //    foreach (var item in result3)
-        //    {
-        //        Console.WriteLine(item);
-        //    }
-
-        //    var someString = "one two three";
-        //    var splitted = someString.Split(' ');
-        //    var result4 = splitted.Aggregate((revert, item) => item + " " + revert).ToUpper();
-
-        //    Console.WriteLine(result4);
-
-        //    int[] intArray = { 1, 2, 3 };
-        //    var max = intArray.Aggregate((sqrSum, item) => sqrSum + item * item);
-        //    var max1 = intArray.Max();
-        //    Console.WriteLine(max);
+        }
 
         private void DataInit()
         {
@@ -311,7 +281,11 @@ namespace bsa15_lec3_List
                 {
                     TestName = "Test #1",
                     CategoryId = 1,
-                    Questions = new int[] { 1, 2 },
+                    Questions = new List<Question> 
+                                    { 
+                                        questions.Single(i => i.QuestionId==1),
+                                        questions.Single(i => i.QuestionId==2),
+                                    },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
                 },
@@ -319,7 +293,11 @@ namespace bsa15_lec3_List
                 {
                     TestName = "Test #2",
                     CategoryId = 2,
-                    Questions = new int[] { 3, 4},
+                     Questions = new List<Question> 
+                                    { 
+                                        questions.Single(i => i.QuestionId==3),
+                                        questions.Single(i => i.QuestionId==4),
+                                    },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
                 },
@@ -327,7 +305,11 @@ namespace bsa15_lec3_List
                 {
                     TestName = "Test #3",
                     CategoryId = 3,
-                    Questions = new int[] { 5, 6 },
+                     Questions = new List<Question> 
+                                    { 
+                                        questions.Single(i => i.QuestionId==5),
+                                        questions.Single(i => i.QuestionId==6),
+                                    },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
                 },
@@ -335,7 +317,11 @@ namespace bsa15_lec3_List
                 {
                     TestName = "Test #4",
                     CategoryId = 4,
-                    Questions = new int[] { 7, 8 },
+                     Questions = new List<Question> 
+                                    { 
+                                        questions.Single(i => i.QuestionId==7),
+                                        questions.Single(i => i.QuestionId==8),
+                                    },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
                 }
@@ -350,73 +336,85 @@ namespace bsa15_lec3_List
                 {
                     QuestionId = 1,
                     CategoryId = 1,
-                    Text = "1 question category 1"
+                    Text = "1 question category 1",
+                    Mark = 3
                 },
                 new Question
                 {
                     QuestionId = 2,
                     CategoryId = 1,
-                    Text = "2 question category 1"
+                    Text = "2 question category 1",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 3,
                     CategoryId = 2,
-                    Text = "3 question category 1"
+                    Text = "3 question category 1",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 4,
                     CategoryId = 2,
-                    Text = "4 question category 2"
+                    Text = "4 question category 2",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 5,
                     CategoryId = 3,
-                    Text = "5 question category 3"
+                    Text = "5 question category 3",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 6,
                     CategoryId = 3,
-                    Text = "6 question category 3"
+                    Text = "6 question category 3",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 7,
                     CategoryId = 4,
-                    Text = "7 question category 4"
+                    Text = "7 question category 4",
+                    Mark = 3
                 },
                 new Question
                 {
                     QuestionId = 8,
                     CategoryId = 4,
-                    Text = "8 question category 4"
+                    Text = "8 question category 4",
+                    Mark = 3
                 },
                 new Question
                 {
                     QuestionId = 9,
                     CategoryId = 5,
-                    Text = "9 question category 5"
+                    Text = "9 question category 5",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 10,
                     CategoryId = 5,
-                    Text = "10 question category 5"
+                    Text = "10 question category 5",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 11,
                     CategoryId = 6,
-                    Text = "11 question category 6"
+                    Text = "11 question category 6",
+                    Mark = 2
                 },
                 new Question
                 {
                     QuestionId = 12,
                     CategoryId = 6,
-                    Text = "12 question category 6"
+                    Text = "12 question category 6",
+                    Mark = 2
                 }
             };
         }
@@ -457,6 +455,5 @@ namespace bsa15_lec3_List
                 }
             };
         }
-
     }
 }
