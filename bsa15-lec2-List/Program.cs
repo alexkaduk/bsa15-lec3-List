@@ -10,7 +10,7 @@ namespace bsa15_lec3_List
     {
         static void Main(string[] args)
         {
-            BSA bsa = new BSA();
+            Bsa bsa = new Bsa();
 
             bsa.UsersPassTest();
             Console.WriteLine();

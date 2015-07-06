@@ -6,24 +6,24 @@ using System.Threading.Tasks;
 
 namespace bsa15_lec3_List
 {
-    class BSA
+    class Bsa
     {
-        public BSA()
+        public Bsa()
         {
             DataInit();
         }
 
-        List<User> users;
-        List<TestWork> testWorks;
-        List<Test> tests;
-        List<Question> questions;
-        List<Category> categories;
+        List<User> _users;
+        List<TestWork> _testWorks;
+        List<Test> _tests;
+        List<Question> _questions;
+        List<Category> _categories;
 
         // -	Список людей, которые прошли тесты.
         public void UsersPassTest()
         {
-            var users = from work in testWorks
-                        join test in tests on work.TestName equals test.TestName
+            var users = from work in _testWorks
+                        join test in _tests on work.TestName equals test.TestName
                         where work.ResultMark >= test.PassMark
                         select new
                         {
@@ -42,8 +42,8 @@ namespace bsa15_lec3_List
         //-	Список тех, кто прошли тесты успешно и уложилися во время.
         public void UsersPassTestWithGoodTime()
         {
-            var users = from work in testWorks
-                        join test in tests on work.TestName equals test.TestName
+            var users = from work in _testWorks
+                        join test in _tests on work.TestName equals test.TestName
                         where (work.ResultMark >= test.PassMark) && (work.ExecutionTime <= test.MaxTestTime)
                         select new
                         {
@@ -65,8 +65,8 @@ namespace bsa15_lec3_List
         //-	Список людей, которые прошли тесты успешно и не уложились во время
         public void UsersPassTestWithBadTime()
         {
-            var users = from work in testWorks
-                        join test in tests on work.TestName equals test.TestName
+            var users = from work in _testWorks
+                        join test in _tests on work.TestName equals test.TestName
                         where (work.ResultMark >= test.PassMark) && (work.ExecutionTime > test.MaxTestTime)
                         select new
                         {
@@ -88,7 +88,7 @@ namespace bsa15_lec3_List
         //-	Список студентов по городам. (Из Львова: 10 студентов, из Киева: 20)
         public void UsersGroupByCity()
         {
-            var usersFromCity = from user in users
+            var usersFromCity = from user in _users
                                 group user by user.City into g
                                 select new
                                 {
@@ -106,9 +106,9 @@ namespace bsa15_lec3_List
         //-	Список успешных студентов по городам.
         public void UsersPassTestGroupByCity()
         {
-            var usersFromCity = from user in users
-                                join work in testWorks on user.Name equals work.UserName
-                                join test in tests on work.TestName equals test.TestName
+            var usersFromCity = from user in _users
+                                join work in _testWorks on user.Name equals work.UserName
+                                join test in _tests on work.TestName equals test.TestName
                                 where (work.ResultMark >= test.PassMark) && (work.ExecutionTime <= test.MaxTestTime)
                                 group user by user.City into g
                                 select new
@@ -143,20 +143,20 @@ namespace bsa15_lec3_List
             //                        ResultPercent = work.ResultMark / test.PassMark * 100,
             //                    };
 
-            var usersResults = users
-                                .Join(testWorks,
+            var usersResults = _users
+                                .Join(_testWorks,
                                         user => user.Name,
                                         work => work.UserName,
                                         (user, work) => new { user, work })
-                                .Join(tests,
+                                .Join(_tests,
                                         tw => tw.work.TestName,
                                         test => test.TestName,
                                         (tw, test) => new { tw, test })
                                 .Select(r => new
                                         {
-                                            Name = r.tw.user.Name,
-                                            ResultMark = r.tw.work.ResultMark,
-                                            ExecutionTime = r.tw.work.ExecutionTime,
+                                            r.tw.user.Name,
+                                            r.tw.work.ResultMark,
+                                            r.tw.work.ExecutionTime,
                                             TestQuestionMarkSum = r.test.Questions.Sum(q => q.Mark),
                                             ResultPercent = r.tw.work.ResultMark / r.test.Questions.Sum(q => q.Mark) * 100
                                         }
@@ -181,7 +181,7 @@ namespace bsa15_lec3_List
 
         private void InitUser()
         {
-            users = new List<User>
+            _users = new List<User>
             {
                 new User
                 {
@@ -233,7 +233,7 @@ namespace bsa15_lec3_List
 
         private void InitTestWork()
         {
-            testWorks = new List<TestWork>
+            _testWorks = new List<TestWork>
             {
                 new TestWork
                 {
@@ -275,7 +275,7 @@ namespace bsa15_lec3_List
 
         private void InitTest()
         {
-            tests = new List<Test>
+            _tests = new List<Test>
             {
                 new Test
                 {
@@ -283,8 +283,8 @@ namespace bsa15_lec3_List
                     CategoryId = 1,
                     Questions = new List<Question> 
                                     { 
-                                        questions.Single(i => i.QuestionId==1),
-                                        questions.Single(i => i.QuestionId==2),
+                                        _questions.Single(i => i.QuestionId==1),
+                                        _questions.Single(i => i.QuestionId==2),
                                     },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
@@ -295,8 +295,8 @@ namespace bsa15_lec3_List
                     CategoryId = 2,
                      Questions = new List<Question> 
                                     { 
-                                        questions.Single(i => i.QuestionId==3),
-                                        questions.Single(i => i.QuestionId==4),
+                                        _questions.Single(i => i.QuestionId==3),
+                                        _questions.Single(i => i.QuestionId==4),
                                     },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
@@ -307,8 +307,8 @@ namespace bsa15_lec3_List
                     CategoryId = 3,
                      Questions = new List<Question> 
                                     { 
-                                        questions.Single(i => i.QuestionId==5),
-                                        questions.Single(i => i.QuestionId==6),
+                                        _questions.Single(i => i.QuestionId==5),
+                                        _questions.Single(i => i.QuestionId==6),
                                     },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
@@ -319,8 +319,8 @@ namespace bsa15_lec3_List
                     CategoryId = 4,
                      Questions = new List<Question> 
                                     { 
-                                        questions.Single(i => i.QuestionId==7),
-                                        questions.Single(i => i.QuestionId==8),
+                                        _questions.Single(i => i.QuestionId==7),
+                                        _questions.Single(i => i.QuestionId==8),
                                     },
                     MaxTestTime = new TimeSpan(0, 24, 0),
                     PassMark = 4
@@ -330,7 +330,7 @@ namespace bsa15_lec3_List
 
         private void InitQuestion()
         {
-            questions = new List<Question>
+            _questions = new List<Question>
             {
                 new Question
                 {
@@ -421,7 +421,7 @@ namespace bsa15_lec3_List
 
         private void InitCategory()
         {
-            categories = new List<Category>
+            _categories = new List<Category>
             {
                 new Category
                 {
